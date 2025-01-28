@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de Sesión</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light d-flex align-items-center justify-content-center vh-100">
+    <div class="card shadow-lg p-4" style="width: 22rem; border-radius: 15px;">
+        <h2 class="text-center mb-4">Inicio de Sesión</h2>
+        <form id="loginForm">
+            <div class="mb-3">
+                <label for="email" class="form-label">Correo Electrónico</label>
+                <input type="email" class="form-control" id="email" placeholder="Ingresa tu correo" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Contraseña</label>
+                <input type="password" class="form-control" id="password" placeholder="Ingresa tu contraseña" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Iniciar Sesión</button>
+        </form>
+    </div>
+
+    <script>
+       
+        const users = [
+            { email: "medico@example.com", password: "medico123", role: "medico", redirectTo: "html/medicos.html" },
+            { email: "cliente@example.com", password: "cliente123", role: "cliente", redirectTo: "html/clientes.html" },
+            { email: "admin@example.com", password: "admin123", role: "administrador", redirectTo: "html/admin.html" }
+        ];
+
+      
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+           
+            const user = users.find(u => u.email === email && u.password === password);
+
+            if (user) {
+              
+                window.location.href = user.redirectTo;
+            } else {
+                alert("Credenciales inválidas. Por favor, inténtalo de nuevo.");
+            }
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
