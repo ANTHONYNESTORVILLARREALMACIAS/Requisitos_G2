@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendar Cita Médica</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light d-flex align-items-center justify-content-center vh-100">
+    <div class="card shadow-lg p-4" style="width: 28rem; border-radius: 15px;">
+        <h2 class="text-center mb-4">Agendar Cita Médica</h2>
+        <form id="appointmentForm">
+            <div class="mb-3">
+                <label for="specialty" class="form-label">Especialidad</label>
+                <select id="specialty" class="form-select" required>
+                    <option value="">Seleccione una especialidad</option>
+                    <option value="Cardiología">Cardiología</option>
+                    <option value="Dermatología">Dermatología</option>
+                    <option value="Pediatría">Pediatría</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="date" class="form-label">Fecha y hora</label>
+                <input type="datetime-local" class="form-control" id="date" required>
+            </div>
+            <div class="mb-3">
+                <label for="representativeName" class="form-label">Nombre del representante</label>
+                <input type="text" class="form-control" id="representativeName" placeholder="Ingrese el nombre" required>
+            </div>
+            <div class="mb-3">
+                <label for="patientName" class="form-label">Nombre del paciente</label>
+                <input type="text" class="form-control" id="patientName" placeholder="Ingrese el nombre" required>
+            </div>
+            <div class="mb-3">
+                <label for="patientAge" class="form-label">Edad del paciente</label>
+                <input type="number" class="form-control" id="patientAge" placeholder="Ingrese la edad" required>
+            </div>
+            <div class="mb-3">
+                <label for="patientGender" class="form-label">Sexo del paciente</label>
+                <select id="patientGender" class="form-select" required>
+                    <option value="">Seleccione el sexo</option>
+                    <option value="Masculino">Masculino</option>
+                    <option value="Femenino">Femenino</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="disability" class="form-label">¿Tiene alguna discapacidad?</label>
+                <input type="text" class="form-control" id="disability" placeholder="Especifique o escriba 'Ninguna'" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Agendar Cita</button>
+        </form>
+        <div id="confirmation" class="mt-3 text-center" style="display: none;">
+            <p>¿Desea confirmar esta cita o añadir una nueva?</p>
+            <button id="confirmButton" class="btn btn-success me-2">Confirmar</button>
+            <button id="addNewButton" class="btn btn-secondary">Añadir Nueva</button>
+        </div>
+        <div id="message" class="mt-3 text-center"></div>
+        <div id="backToClient" class="mt-3 text-center" style="display: none;">
+            <button id="backButton" class="btn btn-primary">Regresar a Clientes</button>
+        </div>
+    </div>
+
+    <script>
+        // Cargar citas desde localStorage
+        const loadAppointments = () => {
+            const appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+            return appointments;
+        };
+
+        // Guardar citas en localStorage
+        const saveAppointments = (appointments) => {
+            localStorage.setItem('appointments', JSON.stringify(appointments));
+        };
+
+        // Manejar el formulario de cita
+        document.getElementById('appointmentForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const specialty = document.getElementById('specialty').value;
+            const date = new Date(document.getElementById('date').value);
+            const representativeName = document.getElementById('representativeName').value;
+            const patientName = document.getElementById('patientName').value;
+            const patientAge = parseInt(document.getElementById('patientAge').value);
+            const patientGender = document.getElementById('patientGender').value;
+            const disability = document.getElementById('disability').value;
+
+            const today = new Date();
+            if (date < today) {
+                document.getElementById('message').innerText = "Error: La fecha no puede ser anterior a la actual.";
+                document.getElementById('message').classList.add('text-danger');
+                return;
+            }
+
+            if (patientAge < 18 || patientAge > 100) {
+                document.getElementById('message').innerText = "Error: La edad debe estar entre 18 y 100 años.";
+                document.getElementById('message').classList.add('text-danger');
+                return;
+            }
+
+            const appointmentData = {
+                specialty,
+                date: date.toISOString(),
+                representativeName,
+                patientName,
+                patientAge,
+                patientGender,
+                disability
+            };
+
+            // Verifica si ya existe una cita con la misma fecha y hora exacta
+            const appointments = loadAppointments();
+            const appointmentExists = appointments.some(a => a.date === appointmentData.date);
+
+            if (appointmentExists) {
+                document.getElementById('message').innerText = "Error: Ya existe una cita agendada para esta fecha y hora.";
+                document.getElementById('message').classList.add('text-danger');
+                return;
+            }
+
+            // Agregar la cita a la lista y guardarla
+            appointments.push(appointmentData);
+            saveAppointments(appointments);
+
+            document.getElementById('confirmation').style.display = 'block';
+            document.getElementById('appointmentForm').style.display = 'none';
+        });
+
+        // Confirmar cita
+        document.getElementById('confirmButton').addEventListener('click', function () {
+            document.getElementById('message').innerText = "Cita agendada con éxito. Por favor, comuníquese con los administradores para coordinar el pago.";
+            document.getElementById('message').classList.add('text-success');
+            document.getElementById('confirmation').style.display = 'none';
+            document.getElementById('backToClient').style.display = 'block';
+
+            const appointments = loadAppointments();
+            const lastAppointment = appointments[appointments.length - 1];
+            const whatsappURL = `https://wa.me/593983874232?text=${encodeURIComponent(
+                `Nueva cita agendada:\n\n` +
+                `Especialidad: ${lastAppointment.specialty}\n` +
+                `Fecha y hora: ${new Date(lastAppointment.date).toLocaleString()}\n` + 
+                `Representante: ${lastAppointment.representativeName}\n` +
+                `Paciente: ${lastAppointment.patientName}, Edad: ${lastAppointment.patientAge}, Sexo: ${lastAppointment.patientGender}\n` +
+                `Discapacidad: ${lastAppointment.disability}`
+            )}`;
+
+            setTimeout(() => {
+                window.open(whatsappURL, '_blank');
+            }, 2000);
+        });
+
+        // Añadir nueva cita
+        document.getElementById('addNewButton').addEventListener('click', function () {
+            document.getElementById('appointmentForm').reset();
+            document.getElementById('appointmentForm').style.display = 'block';
+            document.getElementById('confirmation').style.display = 'none';
+        });
+
+        // Regresar a la página de clientes
+        document.getElementById('backButton').addEventListener('click', function () {
+            window.location.href = "clientes.html";
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

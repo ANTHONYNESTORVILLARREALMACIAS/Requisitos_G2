@@ -18,35 +18,109 @@
                 <label for="password" class="form-label">Contraseña</label>
                 <input type="password" class="form-control" id="password" placeholder="Ingresa tu contraseña" required>
             </div>
-            <button type="submit" class="btn btn-primary w-100">Iniciar Sesión</button>
+            <button type="submit" class="btn btn-primary w-100 mb-2">Iniciar Sesión</button>
         </form>
+        <button id="registerBtn" class="btn btn-secondary w-100">Registrarse</button>
+    </div>
+
+    <div class="modal" id="registerModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Registro de Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="registerForm">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="name" placeholder="Ingresa tu nombre" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerEmail" class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="registerEmail" placeholder="Ingresa tu correo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Número de Teléfono</label>
+                            <input type="tel" class="form-control" id="phone" placeholder="Ingresa tu número de teléfono" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerPassword" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="registerPassword" placeholder="Ingresa tu contraseña" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Registrar</button>
+                    </form>
+                </div> 
+            </div>
+        </div>
     </div>
 
     <script>
-       
         const users = [
             { email: "medico@example.com", password: "medico123", role: "medico", redirectTo: "html/medicos.html" },
             { email: "cliente@example.com", password: "cliente123", role: "cliente", redirectTo: "html/clientes.html" },
             { email: "admin@example.com", password: "admin123", role: "administrador", redirectTo: "html/admin.html" }
         ];
 
-      
         document.getElementById('loginForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-           
             const user = users.find(u => u.email === email && u.password === password);
 
             if (user) {
-              
                 window.location.href = user.redirectTo;
             } else {
                 alert("Credenciales inválidas. Por favor, inténtalo de nuevo.");
             }
         });
+
+        document.getElementById('registerBtn').addEventListener('click', function () {
+            const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+            registerModal.show();
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+        
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const password = document.getElementById('registerPassword').value;
+        
+            // Verificar campos obligatorios
+            if (!name || !email || !phone || !password) {
+                alert("Por favor, completa todos los campos obligatorios.");
+                return;
+            }
+        
+            // Verificar si el correo ya está registrado
+            if (users.some(user => user.email === email)) {
+                alert("El correo electrónico ya está en uso.");
+                return;
+            }
+        
+            // Validar contraseña
+            const passwordRegex = /^(?=.*[!@#$%^&*.,])(?=.*[A-Z])(?=.*\d).{8,}$/;
+            if (!passwordRegex.test(password)) {
+                alert(`
+        La contraseña debe cumplir con los siguientes criterios:
+        - Tener al menos 8 caracteres.
+        - Incluir al menos un carácter especial (!@#$%^&*).
+        - Incluir al menos una letra mayúscula.
+        - Incluir al menos un número.
+                `);
+                return;
+            }
+        
+            // Si todo está bien, registrar usuario
+            users.push({ email, password, role: "cliente", redirectTo: "html/clientes.html" });
+            alert("Registro exitoso. Por favor, inicia sesión para continuar.");
+            document.getElementById('registerForm').reset();
+        });
+        
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
