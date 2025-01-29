@@ -61,15 +61,35 @@
     </div>
 
     <script>
-        // Cargar citas desde localStorage
-        const loadAppointments = () => {
-            const appointments = JSON.parse(localStorage.getItem('appointments')) || [];
-            return appointments;
+        // Array para almacenar las citas de la sesión actual
+        let sessionAppointments = [];
+
+        // Función para verificar si la fecha ya está ocupada (ahora con comparación precisa)
+        const isDateOccupied = (date) => {
+            // Iteramos sobre las citas existentes para verificar la fecha
+            for (let appointment of sessionAppointments) {
+                const existingDate = new Date(appointment.date);
+
+                // Normalizamos la fecha de ambas partes, comparando solo la fecha y la hora (sin minutos ni segundos)
+                if (existingDate.toISOString().slice(0, 16) === date.toISOString().slice(0, 16)) {
+                    return true; // Si hay coincidencia, la fecha está ocupada
+                }
+            }
+            return false; // Si no hay coincidencias, la fecha está libre
         };
 
-        // Guardar citas en localStorage
-        const saveAppointments = (appointments) => {
-            localStorage.setItem('appointments', JSON.stringify(appointments));
+        // Enviar las citas a WhatsApp (solo las citas recientes)
+        const sendWhatsApp = (appointments) => {
+            const formattedAppointments = appointments.map(a => 
+                `Especialidad: ${a.specialty}\n` +
+                `Fecha y hora: ${new Date(a.date).toLocaleString()}\n` +
+                `Representante: ${a.representativeName}\n` +
+                `Paciente: ${a.patientName}, Edad: ${a.patientAge}, Sexo: ${a.patientGender}\n` +
+                `Discapacidad: ${a.disability}\n`
+            ).join('\n');
+
+            const whatsappURL = `https://wa.me/?text=${encodeURIComponent(formattedAppointments)}`;
+            window.open(whatsappURL, '_blank');
         };
 
         // Manejar el formulario de cita
@@ -97,6 +117,13 @@
                 return;
             }
 
+            // Verificar si la fecha está ocupada
+            if (isDateOccupied(date)) {
+                document.getElementById('message').innerText = "Error: La fecha y hora seleccionada ya está ocupada.";
+                document.getElementById('message').classList.add('text-danger');
+                return;
+            }
+
             const appointmentData = {
                 specialty,
                 date: date.toISOString(),
@@ -107,45 +134,22 @@
                 disability
             };
 
-            // Verifica si ya existe una cita con la misma fecha y hora exacta
-            const appointments = loadAppointments();
-            const appointmentExists = appointments.some(a => a.date === appointmentData.date);
-
-            if (appointmentExists) {
-                document.getElementById('message').innerText = "Error: Ya existe una cita agendada para esta fecha y hora.";
-                document.getElementById('message').classList.add('text-danger');
-                return;
-            }
-
-            // Agregar la cita a la lista y guardarla
-            appointments.push(appointmentData);
-            saveAppointments(appointments);
+            // Agregar la cita a la sesión actual
+            sessionAppointments.push(appointmentData);
 
             document.getElementById('confirmation').style.display = 'block';
             document.getElementById('appointmentForm').style.display = 'none';
         });
 
-        // Confirmar cita
+        // Confirmar cita y enviar solo las citas recientes por WhatsApp
         document.getElementById('confirmButton').addEventListener('click', function () {
-            document.getElementById('message').innerText = "Cita agendada con éxito. Por favor, comuníquese con los administradores para coordinar el pago.";
-            document.getElementById('message').classList.add('text-success');
+            if (sessionAppointments.length > 0) {
+                sendWhatsApp(sessionAppointments);
+                document.getElementById('message').innerText = "Citas enviadas con éxito por WhatsApp.";
+                document.getElementById('message').classList.add('text-success');
+            }
             document.getElementById('confirmation').style.display = 'none';
             document.getElementById('backToClient').style.display = 'block';
-
-            const appointments = loadAppointments();
-            const lastAppointment = appointments[appointments.length - 1];
-            const whatsappURL = `https://wa.me/593983874232?text=${encodeURIComponent(
-                `Nueva cita agendada:\n\n` +
-                `Especialidad: ${lastAppointment.specialty}\n` +
-                `Fecha y hora: ${new Date(lastAppointment.date).toLocaleString()}\n` + 
-                `Representante: ${lastAppointment.representativeName}\n` +
-                `Paciente: ${lastAppointment.patientName}, Edad: ${lastAppointment.patientAge}, Sexo: ${lastAppointment.patientGender}\n` +
-                `Discapacidad: ${lastAppointment.disability}`
-            )}`;
-
-            setTimeout(() => {
-                window.open(whatsappURL, '_blank');
-            }, 2000);
         });
 
         // Añadir nueva cita
