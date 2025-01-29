@@ -50,16 +50,58 @@
                          <br>
                          <br>
                          <br>
-                        <li class="nav-item mt-auto" style="background-color: #f8d7da; border-radius: 5px;">
-                            <a class="nav-link text-danger" href="../index.html" style="font-weight: bold; font-size: 18px; color: #721c24;">
+                         <li class="nav-item mt-auto" style="background-color: #f8d7da; border-radius: 5px; text-align: center;">
+                            <a class="nav-link text-danger" href="../index.html" style="font-weight: bold; font-size: 18px; color: #721c24; display: inline-block;">
                                 Salir
                             </a>
                         </li>
+                        
                     </ul>
                 </div>
             </nav>
             
-            
+            <!-- Modal para agregar o editar especialista -->
+<div class="modal fade" id="specialistModal" tabindex="-1" aria-labelledby="specialistModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="specialistModalLabel">Agregar/Editar Especialista</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="specialistForm">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nombre Completo</label>
+                        <input type="text" class="form-control" id="name" required>
+                        <div id="nameError" class="error-message">El nombre solo puede contener letras y espacios.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Número de Teléfono</label>
+                        <input type="text" class="form-control" id="phone" required>
+                        <div id="phoneError" class="error-message">El número debe ser un teléfono móvil válido (09xxxxxxxx).</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Correo Electrónico</label>
+                        <input type="email" class="form-control" id="email" required>
+                        <div id="emailError" class="error-message">El correo electrónico no es válido.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Título</label>
+                        <input type="text" class="form-control" id="title" required>
+                        <div id="titleError" class="error-message">El título solo puede contener letras y espacios.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="area" class="form-label">Área de Dominio</label>
+                        <input type="text" class="form-control" id="area" required>
+                        <div id="areaError" class="error-message">El área solo puede contener letras y espacios.</div>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="saveSpecialist()">Guardar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
             
 
             <!-- Contenido principal -->
@@ -100,8 +142,8 @@
             </main>
         </div>
     </div>
-
     <script>
+    
         // Función para buscar especialistas
         function searchSpecialist() {
             const input = document.getElementById('searchInput').value.toLowerCase();
@@ -127,9 +169,9 @@
         function clearForm() {
             document.getElementById("specialistForm").reset();
         }
-    </script>
+  
 
-    <script>
+    
         let specialists = [
             { name: "Juan Perez", phone: "0987654321", email: "juan@gmail.com", title: "Enfermero", area: "Pediatria" },
             { name: "Maria Lopez", phone: "0998765432", email: "maria@gmail.com", title: "Medico Osteopata", area: "Medicina General" },
