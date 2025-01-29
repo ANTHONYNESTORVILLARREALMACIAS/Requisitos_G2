@@ -117,6 +117,45 @@
                         </div>
                     </div>
                 </div>
+                <h1 class="mt-4">Notificar Cancelación de Cita</h1>
+                <br>
+
+                <!-- Selección de método de notificación -->
+                <label for="notificationMethod">Selecciona el método de notificación:</label>
+                <select id="notificationMethod" class="form-select mb-3">
+                    <option value="whatsapp">WhatsApp</option>
+                    <option value="email">Correo Electrónico</option>
+                    <option value="both">Ambos</option>
+                </select>
+
+                <!-- Tabla de citas canceladas -->
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Paciente</th>
+                            <th>Fecha y Hora</th>
+                            <th>Notificar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="canceledAppointmentsList">
+                        <tr>
+                            <td>Juan Pérez</td>
+                            <td>2025-01-30 4:00</td>
+                            <td><button class="btn btn-outline-primary" onclick="notifyCancellation(0)">Notificar</button></td>
+                        </tr>
+                        <tr>
+                            <td>Ana Gómez</td>
+                            <td>2025-01-30 12:00</td>
+                            <td><button class="btn btn-outline-primary" onclick="notifyCancellation(1)">Notificar</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Mensaje de confirmación -->
+                <!-- Mensaje de notificación -->
+<div id="notificationMessage" class="alert alert-info confirmation-message" style="display: none;">
+                    La notificación ha sido enviada correctamente.
+                </div>
             </main>
         </div>
     </div>
@@ -134,6 +173,19 @@
             { name: "Pedro Rodríguez", datetime: "2025-01-31T11:00:00" }
         ];
 
+        function notifyCancellation(appointmentId) {
+            const method = document.getElementById('notificationMethod').value;
+            const patients = [
+                { name: "Juan Pérez", datetime: "2025-01-30T14:00:00" },
+                { name: "Ana Gómez", datetime: "2025-01-30T16:00:00" }
+            ];
+            const appointment = patients[appointmentId];
+            console.log(`Notificando a ${appointment.name} por ${method}`);
+    
+            const notificationMessage = document.getElementById('notificationMessage');
+            notificationMessage.style.display = 'block';
+            notificationMessage.textContent = `La notificación ha sido enviada a ${appointment.name} por ${method}.`;
+        }
         // Mostrar el estado de las citas y verificar si se puede cancelar
         function cancelAppointment(appointmentId) {
             currentAppointmentId = appointmentId;

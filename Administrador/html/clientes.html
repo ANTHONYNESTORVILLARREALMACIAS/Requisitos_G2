@@ -63,6 +63,11 @@
             <button id="backToClientButton" class="btn btn-primary w-100">Regresar a Clientes</button>
         </div>
 
+        <!-- Botón para redirigir a citas.html -->
+        <div id="viewAppointmentsSection" class="mt-3 text-center" style="display: none;">
+            <button id="viewAppointmentsButton" class="btn btn-info w-100">Ver Citas Agendadas</button>
+        </div>
+
         <div id="message" class="mt-3 text-center"></div>
     </div>
 
@@ -143,6 +148,11 @@
 
             document.getElementById('confirmation').style.display = 'block';
             document.getElementById('appointmentForm').style.display = 'none';
+
+            // Si hay citas, mostrar el botón para ver citas agendadas
+            if (sessionAppointments.length > 0) {
+                document.getElementById('viewAppointmentsSection').style.display = 'block';
+            }
         });
 
         // Confirmar cita y enviar solo las citas recientes por WhatsApp
@@ -171,6 +181,11 @@
         // Regresar a la página de clientes
         document.getElementById('backToClientButton').addEventListener('click', function () {
             window.location.href = "clientes.html";
+        });
+
+        // Ver citas agendadas
+        document.getElementById('viewAppointmentsButton').addEventListener('click', function () {
+            window.location.href = "citas.html";
         });
     </script>
 
