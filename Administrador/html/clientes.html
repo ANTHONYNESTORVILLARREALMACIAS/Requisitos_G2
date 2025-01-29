@@ -49,15 +49,21 @@
             </div>
             <button type="submit" class="btn btn-primary w-100">Agendar Cita</button>
         </form>
+        
+        <!-- Confirmación y botones adicionales -->
         <div id="confirmation" class="mt-3 text-center" style="display: none;">
             <p>¿Desea confirmar esta cita o añadir una nueva?</p>
             <button id="confirmButton" class="btn btn-success me-2">Confirmar</button>
             <button id="addNewButton" class="btn btn-secondary">Añadir Nueva</button>
         </div>
-        <div id="message" class="mt-3 text-center"></div>
-        <div id="backToClient" class="mt-3 text-center" style="display: none;">
-            <button id="backButton" class="btn btn-primary">Regresar a Clientes</button>
+
+        <!-- Botones de pago y regresar -->
+        <div id="paymentSection" class="mt-3 text-center" style="display: none;">
+            <button id="paymentButton" class="btn btn-success w-100">Realizar Pago</button>
+            <button id="backToClientButton" class="btn btn-primary w-100">Regresar a Clientes</button>
         </div>
+
+        <div id="message" class="mt-3 text-center"></div>
     </div>
 
     <script>
@@ -69,8 +75,6 @@
             // Iteramos sobre las citas existentes para verificar la fecha
             for (let appointment of sessionAppointments) {
                 const existingDate = new Date(appointment.date);
-
-                // Normalizamos la fecha de ambas partes, comparando solo la fecha y la hora (sin minutos ni segundos)
                 if (existingDate.toISOString().slice(0, 16) === date.toISOString().slice(0, 16)) {
                     return true; // Si hay coincidencia, la fecha está ocupada
                 }
@@ -149,7 +153,7 @@
                 document.getElementById('message').classList.add('text-success');
             }
             document.getElementById('confirmation').style.display = 'none';
-            document.getElementById('backToClient').style.display = 'block';
+            document.getElementById('paymentSection').style.display = 'block';  // Mostrar los botones de pago y regresar
         });
 
         // Añadir nueva cita
@@ -159,8 +163,13 @@
             document.getElementById('confirmation').style.display = 'none';
         });
 
+        // Redirigir a la página de pago
+        document.getElementById('paymentButton').addEventListener('click', function () {
+            window.location.href = "ConfirmarPago.html";
+        });
+
         // Regresar a la página de clientes
-        document.getElementById('backButton').addEventListener('click', function () {
+        document.getElementById('backToClientButton').addEventListener('click', function () {
             window.location.href = "clientes.html";
         });
     </script>
